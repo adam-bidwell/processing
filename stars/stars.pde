@@ -1,21 +1,42 @@
-float lastX = mouseX;
+// maximum stars on screen at once (once a star is off the edges, it immediately
+// "fades", so this could be a lot lower if performance is an issue
 int MAX_STARS = 2000;
+
+// maximum speed the star can be emitted
 int MAX_SPEED = 10;
+
+// gravity constant
 float GRAVITY = 0.1;
+
+// rate that the bounce deteriorates the speed
 float BOUNCE_MODIFIER = -0.75;
+
+// star size
 float INIT_SCALE = 0.6;
+
+// increment to hue on each button press
 float HUE_INCREMENT = 31;
+
+// general init values
 int current_star = 0;
 int hue = 0;
 Star[] stars;
+float lastX = mouseX;
 
+// go fullscreen
 boolean sketchFullScreen() {
   return true;
 }
 
+// setup the screen
 void setup() {
+  // we're going to use 360 degree hue and percentages for saturation and brightness
   colorMode(HSB, 360, 100, 100);
+  
+  // screensize is max for fullscreen
   size(displayWidth,displayHeight,P3D);
+  
+  // initialise the star objets
   stars = new Star[MAX_STARS];
   for (int s = 0; s < stars.length; s ++) {
     stars[s] = new Star();
@@ -23,8 +44,10 @@ void setup() {
 }
 
 void draw() {
+  // clear the background each frame
   background(200,80,20);
 
+  // if the star isn't faded, update the physics/position and draw it
   for (int s = 0; s < stars.length; s ++) {
     if (!stars[s].isFaded()) {
       stars[s].update();
@@ -34,13 +57,17 @@ void draw() {
 }
 
 void mousePressed() {
+  // increment the colour value
   hue += HUE_INCREMENT;
   while (hue >= 360) hue -= 360;
 }
 
 void mouseDragged() {
+  // when the mouse is being dragged, emit stars
   for (int s = 0; s < MAX_STARS; s ++) {
     if (stars[s].isFaded()) {
+      // find the first 'faded' star in the queue
+      // reset it and fire it off in the opposite direction to the drag
       float direction = lastX - mouseX;
       stars[s] = new Star(hue, mouseX, mouseY, direction);
       break;
